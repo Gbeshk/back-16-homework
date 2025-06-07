@@ -159,3 +159,24 @@ export async function updateProduct(req: Request, res: Response) {
 
   res.json({ message: "updated successfully" });
 }
+
+export async function addReview(req: Request, res: Response) {
+  const { comment, rating } = req.body;
+  const email = req.headers["email"] as string;
+  const { id } = req.params;
+
+  const product = await productModel.findById(id);
+
+  if (!product) {
+    res.status(404).json({ error: "პროდუქტი ვერ მოიძებნა" });
+    return;
+  }
+
+  const newReview = { comment, email, rating };
+
+  product.reviews.push(newReview);
+
+  await product.save();
+
+  res.status(200).json({ message: "მიმოხილვა დაემატა წარმატებით", product });
+}
