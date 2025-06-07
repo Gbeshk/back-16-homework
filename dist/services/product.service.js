@@ -17,6 +17,7 @@ exports.addProduct = addProduct;
 exports.getById = getById;
 exports.deleteProduct = deleteProduct;
 exports.updateProduct = updateProduct;
+exports.addReview = addReview;
 const product_model_1 = __importDefault(require("../models/product.model"));
 const mongoose_1 = require("mongoose");
 const cloudinary_config_1 = require("../config/cloudinary.config");
@@ -148,5 +149,21 @@ function updateProduct(req, res) {
             return;
         }
         res.json({ message: "updated successfully" });
+    });
+}
+function addReview(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const { comment, rating } = req.body;
+        const email = req.headers["email"];
+        const { id } = req.params;
+        const product = yield product_model_1.default.findById(id);
+        if (!product) {
+            res.status(404).json({ error: "product not found" });
+            return;
+        }
+        const newReview = { comment, email, rating };
+        product.reviews.push(newReview);
+        yield product.save();
+        res.status(200).json({ message: "review added", product });
     });
 }

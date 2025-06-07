@@ -168,7 +168,7 @@ export async function addReview(req: Request, res: Response) {
   const product = await productModel.findById(id);
 
   if (!product) {
-    res.status(404).json({ error: "პროდუქტი ვერ მოიძებნა" });
+    res.status(404).json({ error: "product not found" });
     return;
   }
 
@@ -178,5 +178,5 @@ export async function addReview(req: Request, res: Response) {
 
   await product.save();
 
-  res.status(200).json({ message: "მიმოხილვა დაემატა წარმატებით", product });
+  res.status(200).json({ message: "review added", product });
 }
