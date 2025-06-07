@@ -22,8 +22,40 @@ const mongoose_1 = require("mongoose");
 const cloudinary_config_1 = require("../config/cloudinary.config");
 function getAllProducts(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        const products = yield product_model_1.default.find();
-        res.json(products);
+        const { category, price, page, limit, search } = req.query;
+        const filter = {
+            $or: [],
+        };
+        const sort = {};
+        if (typeof category === "string") {
+            filter.category = { $regex: category, $options: "i" };
+        }
+        if (typeof search === "string") {
+            filter.$or = [
+                { title: { $regex: search, $options: "i" } },
+                { description: { $regex: search, $options: "i" } },
+            ];
+        }
+        if (price === "desc") {
+            sort.price = -1;
+        }
+        else if (price === "asc") {
+            sort.price = 1;
+        }
+        let limitNum = 30;
+        if (limit) {
+            limitNum = Number(limit);
+        }
+        let skip = 0;
+        if (page) {
+            skip = (Number(page) - 1) * limitNum;
+        }
+        const result = yield product_model_1.default
+            .find(filter)
+            .sort(sort)
+            .limit(limitNum)
+            .skip(skip);
+        res.json(result);
     });
 }
 function addProduct(req, res) {
@@ -85,7 +117,6 @@ function deleteProduct(req, res) {
             .replace(/\.[^/.]+$/, "");
         yield (0, cloudinary_config_1.deleteFromCloudinary)(publicId);
         yield (0, cloudinary_config_1.deleteFromCloudinary)(imageUrl);
-        console.log(imageUrl);
         res.json({ message: "deleted successfully", data: deletedProduct });
     });
 }

@@ -43,4 +43,3 @@ const productUpdateSchema = Joi.object({
 });
 
 export { productSchema, productUpdateSchema };
-export default productSchema;

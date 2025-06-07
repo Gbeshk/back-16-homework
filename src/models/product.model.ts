@@ -1,4 +1,5 @@
 import { default as mongoose } from "mongoose";
+import reviewSchema from "./review.model";
 
 const productSchema = new mongoose.Schema(
   {
@@ -22,6 +23,14 @@ const productSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    reviews: [
+      {
+        email: { type: String, required: true },
+        comment: { type: String, required: true },
+        rating: { type: Number, required: true },
+      },
+      { timestamps: true },
+    ],
   },
   { timestamps: true }
 );

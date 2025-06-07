@@ -25,5 +25,13 @@ const productSchema = new mongoose_1.default.Schema({
         type: String,
         required: true,
     },
+    reviews: [
+        {
+            email: { type: String, required: true },
+            comment: { type: String, required: true },
+            rating: { type: Number, required: true },
+        },
+        { timestamps: true },
+    ],
 }, { timestamps: true });
 exports.default = mongoose_1.default.model("Product", productSchema);

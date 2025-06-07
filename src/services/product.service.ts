@@ -3,9 +3,61 @@ import productModel from "../models/product.model";
 import { isValidObjectId } from "mongoose";
 import { deleteFromCloudinary } from "../config/cloudinary.config";
 
+type RegexType = {
+  $regex: string;
+  $options: string;
+};
+
+type FilterType = {
+  $or: (
+    | { title: { $regex: string; $options: string }; description?: undefined }
+    | { description: { $regex: string; $options: string }; title?: undefined }
+  )[];
+  category?: RegexType;
+  title?: RegexType;
+};
+
+type SortType = {
+  price?: 1 | -1;
+};
+
 export async function getAllProducts(req: Request, res: Response) {
-  const products = await productModel.find();
-  res.json(products);
+  const { category, price, page, limit, search } = req.query;
+
+  const filter: FilterType = {
+    $or: [],
+  };
+  const sort: SortType = {};
+
+  if (typeof category === "string") {
+    filter.category = { $regex: category, $options: "i" };
+  }
+  if (typeof search === "string") {
+    filter.$or = [
+      { title: { $regex: search, $options: "i" } },
+      { description: { $regex: search, $options: "i" } },
+    ];
+  }
+  if (price === "desc") {
+    sort.price = -1;
+  } else if (price === "asc") {
+    sort.price = 1;
+  }
+  let limitNum = 30;
+  if (limit) {
+    limitNum = Number(limit);
+  }
+  let skip = 0;
+  if (page) {
+    skip = (Number(page) - 1) * limitNum;
+  }
+  const result = await productModel
+    .find(filter)
+    .sort(sort)
+    .limit(limitNum)
+    .skip(skip);
+
+  res.json(result);
 }
 
 export async function addProduct(req: Request, res: Response) {

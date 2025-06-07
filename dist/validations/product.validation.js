@@ -47,4 +47,3 @@ const productUpdateSchema = joi_1.default.object({
     }),
 });
 exports.productUpdateSchema = productUpdateSchema;
-exports.default = productSchema;
